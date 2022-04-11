@@ -79,7 +79,7 @@ async def pervonah(message: types.Message, state: FSMContext):
                          f"\nСессии: <code>{sessions_file}</code></b>"
     )
     await generate_config_file(data, message.from_user.id)
-    proj = subprocess.Popen(f"python Modules/runners/Pervonah.py {message.from_user.id}",shell=True)
+    proj = subprocess.Popen(f"python3 Modules/Pervonah.py {message.from_user.id}",shell=True)
     pid = proj.pid
     config_file = f"Sessions/pervonah_data_{message.from_user.id}/config.txt"
     with open(config_file, "a") as file:
