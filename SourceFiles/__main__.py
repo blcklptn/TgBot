@@ -7,7 +7,7 @@ import logging
 
 from Modules import pervonaxer, inviter, rassilka
 
-
+print('starting')
 @dp.message_handler(commands=['start'], state="*")
 async def cmd_start(message: types.Message, state: FSMContext):
     await message.answer(f"Привет, {message.from_user.first_name}!", reply_markup=MainKeyboard.MainKeyboard())

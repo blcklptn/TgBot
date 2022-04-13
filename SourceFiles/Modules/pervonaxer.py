@@ -14,9 +14,10 @@ async def generate_config_file(data: dict, id: str):
     with open(config_file, "w") as file:
         file.write(f"{data['links']}\n{data['comments_file']}\n{data['count']}")
     
-
+print(654)
 @dp.message_handler(state = 'pervonah_1', content_types = ContentType.DOCUMENT)
 async def pervonah(message: types.Message, state: FSMContext):
+    print(123)
     try:
         with open(f"Sessions/pervonah_data_{message.chat.id}/config.txt", "r") as file:
             data = file.read().splitlines()
@@ -79,7 +80,7 @@ async def pervonah(message: types.Message, state: FSMContext):
                          f"\nСессии: <code>{sessions_file}</code></b>"
     )
     await generate_config_file(data, message.from_user.id)
-    proj = subprocess.Popen(f"python3 Modules/Pervonah.py {message.from_user.id}",shell=True)
+    proj = subprocess.Popen(f"python3 Modules/Pervonah.py {message.from_user.id} {count}",shell=True)
     pid = proj.pid
     config_file = f"Sessions/pervonah_data_{message.from_user.id}/config.txt"
     with open(config_file, "a") as file:

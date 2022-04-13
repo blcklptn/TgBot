@@ -13,14 +13,52 @@ import random
 from Data import config
 PATH = "Sessions/rassilka_"
 
-
-async def send_to_users(usernames,user_id, sessions, message):
-    for user in usernames:
-        client = telethon.TelegramClient(f"Sessions/rassilka_{user_id}/{sessions[random.randint(0, len(sessions)-1)]}", config.app_id, config.api_hash)
-        await client.start()
-        await client.connect()
-        await client.send_message(f"@{user[0]}", message)
+async def filterSessions(path, sessions):
+    print('filtering sessions')
+    working_sessions = []
+    for sessionq in sessions:
+        logged = False
+        try:
+            client = telethon.TelegramClient(f"{path}/{sessionq}", config.app_id, config.api_hash)
+            #client = telethon.TelegramClient(f"Sessions/new_session.session", config.app_id, config.api_hash)
+            await client.connect()
+            logged = await client.get_me()
+        except Exception as e:
+            print(str(e))
+            continue
+        if (logged):
+            print('IS LOGGED')
+        else:
+            print('NOT LOGGED')
+            continue
+        working_sessions.append(sessionq)
         await client.disconnect()
+    return working_sessions
+async def send_to_users(usernames,user_id, sessions, message, msgobj):
+    print('sending to users')
+    sessions = await filterSessions(f"Sessions/rassilka_{user_id}", sessions)
+    sended = 0
+    for user in usernames:
+        logged = False
+        try:
+            client = telethon.TelegramClient(f"Sessions/rassilka_{user_id}/{sessions[random.randint(0, len(sessions)-1)]}", config.app_id, config.api_hash)
+            #client = telethon.TelegramClient(f"Sessions/new_session.session", config.app_id, config.api_hash)
+            await client.connect()
+            logged = await client.get_me()
+        except Exception as e:
+            print(str(e))
+            continue
+        if (logged):
+            print('IS LOGGED 2')
+        else:
+            print('NOT LOGGED 2')
+            continue
+        await client.start()
+        await client.send_message(f"@{user[0]}", message)
+        sended = sended + 1
+        await client.disconnect()
+    await msgobj.answer(f"Сообщение отправлено {sended} пользователям\nрабочих сессий: {len(sessions)}")
+    return sended
 
 
 @dp.message_handler(state = "rassilka_1", content_types = ContentType.DOCUMENT)
@@ -69,4 +107,4 @@ async def rassilka(message: types.Message, state: FSMContext):
     
     await state.finish()
     PATH = "Sessions/rassilka_"
-    await send_to_users(usernames, message.from_user.id, sessions, messageq)
+    sended = await send_to_users(usernames, message.from_user.id, sessions, messageq, message)
